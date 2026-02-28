@@ -2,5 +2,4 @@ pyrogram==2.0.106
 TgCrypto==1.2.5
 fastapi==0.111.0
 python-dotenv==1.0.1
-python-3.11.9
 aiohttp==3.9.5
