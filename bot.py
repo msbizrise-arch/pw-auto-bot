@@ -1,13 +1,13 @@
 """
 bot.py — Main Entry Point (Polling Mode - Stable)
-Production-safe for Python 3.11–3.14
+Python 3.11+ Safe
 """
 
 import sys
 import asyncio
 from pyrogram import Client
 
-# Optional uvloop
+# Optional uvloop (safe)
 if sys.platform != "win32":
     try:
         import uvloop
@@ -17,7 +17,7 @@ if sys.platform != "win32":
 
 from config import BOT_TOKEN, API_ID, API_HASH, SUDO_USERS
 from db.database import init_db
-from core.userbot import start_userbot, stop_userbot
+from core.userbot import userbot  # ✅ import instance directly
 from handlers.start import register_start
 from handlers.settings import register_settings
 from handlers.extraction import register_extraction
@@ -29,9 +29,9 @@ async def main():
     init_db()
     print("[Boot] ✅ DB ready")
 
-    # 2️⃣ Start userbot (second Telegram account)
+    # 2️⃣ Start userbot properly
     print("[Boot] Starting userbot...")
-    await start_userbot()
+    await userbot.start()
     print("[Boot] ✅ Userbot started")
 
     # 3️⃣ Start Bot Client
@@ -64,7 +64,7 @@ async def main():
 
     print("[Boot] 🚀 Polling started...")
 
-    # Keep bot running forever
+    # Keep running forever
     await asyncio.Event().wait()
 
 
