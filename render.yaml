@@ -3,12 +3,9 @@ services:
     name: pw-auto-bot
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn bot:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
+    startCommand: python bot.py
     envVars:
       - key: BOT_TOKEN
-        sync: false
-      - key: WEBHOOK_URL
         sync: false
       - key: API_ID
         sync: false
