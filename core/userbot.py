@@ -12,8 +12,16 @@ from config import API_ID, API_HASH, SESSION
 _userbot: Client | None = None
 
 
+# ─────────────────────────────
+# Start / Stop
+# ─────────────────────────────
+
 async def start_userbot() -> Client:
     global _userbot
+
+    if _userbot and _userbot.is_connected:
+        return _userbot
+
     _userbot = Client(
         name="ub",
         api_id=API_ID,
@@ -21,15 +29,17 @@ async def start_userbot() -> Client:
         session_string=SESSION,
         no_updates=False,
     )
+
     await _userbot.start()
     me = await _userbot.get_me()
     print(f"[Userbot] ✅ {me.first_name} (@{me.username})")
+
     return _userbot
 
 
 async def stop_userbot():
     global _userbot
-    if _userbot:
+    if _userbot and _userbot.is_connected:
         await _userbot.stop()
 
 
@@ -39,7 +49,9 @@ def get_userbot() -> Client:
     return _userbot
 
 
-# ── Core helpers ──
+# ─────────────────────────────
+# Core helpers
+# ─────────────────────────────
 
 async def ub_send(chat: str, text: str, delay: float = 3.0):
     await get_userbot().send_message(chat, text)
@@ -63,36 +75,51 @@ async def ub_wait_reply(
     timeout: int = 180,
     check=None
 ) -> Message | None:
+
     ub = get_userbot()
-    deadline = asyncio.get_event_loop().time() + timeout
+
+    loop = asyncio.get_running_loop()   # ✅ FIXED
+    deadline = loop.time() + timeout
+
     last = after_id
 
-    while asyncio.get_event_loop().time() < deadline:
+    while loop.time() < deadline:
         await asyncio.sleep(3)
+
         async for m in ub.get_chat_history(chat, limit=8):
             if m.id <= last:
                 break
+
             last = max(last, m.id)
+
             if check is None or check(m):
                 return m
+
     return None
 
 
 async def ub_wait_file(chat: str, after_id: int, ext=".txt", timeout=300) -> Message | None:
     return await ub_wait_reply(
-        chat, after_id, timeout=timeout,
-        check=lambda m: bool(m.document and (m.document.file_name or "").endswith(ext))
+        chat,
+        after_id,
+        timeout=timeout,
+        check=lambda m: bool(
+            m.document and
+            (m.document.file_name or "").endswith(ext)
+        )
     )
 
 
 async def ub_download(msg: Message, path: str) -> str:
-    import os; os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    import os
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     return await get_userbot().download_media(msg, file_name=path)
 
 
 async def ub_click_btn(msg: Message, keyword: str) -> bool:
     if not msg.reply_markup:
         return False
+
     for row in msg.reply_markup.inline_keyboard:
         for btn in row:
             if keyword.lower() in (btn.text or "").lower():
@@ -102,6 +129,7 @@ async def ub_click_btn(msg: Message, keyword: str) -> bool:
                     return True
                 except Exception:
                     pass
+
     return False
 
 
