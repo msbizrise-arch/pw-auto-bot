@@ -2,7 +2,6 @@ services:
   - type: web
     name: pw-auto-bot
     runtime: python
-    pythonVersion: "3.11.9"          # ← Pin to 3.11 — Pyrogram stable here
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
     healthCheckPath: /health
