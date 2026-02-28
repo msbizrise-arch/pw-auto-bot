@@ -1,7 +1,7 @@
 """
 bot.py â€” Main Entry Point (Web Service Mode)
 
-Fix: Python 3.14 asyncio event loop compatibility
+Fix: Python 3.11 asyncio event loop compatibility
      Uvicorn starts first (port binding), bot init inside lifespan
 """
 
