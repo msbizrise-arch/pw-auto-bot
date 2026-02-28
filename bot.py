@@ -17,7 +17,7 @@ if sys.platform != "win32":
 
 from config import BOT_TOKEN, API_ID, API_HASH, SUDO_USERS
 from db.database import init_db
-from core.userbot import userbot  # ✅ import instance directly
+from core.userbot import start_userbot, stop_userbot  # ✅ import instance directly
 from handlers.start import register_start
 from handlers.settings import register_settings
 from handlers.extraction import register_extraction
