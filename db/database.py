@@ -1,16 +1,16 @@
 import sqlite3
 import os
 from datetime import datetime, timedelta
-from config import DB_PATH, SUDO_USERS
-import os
+from config import SUDO_USERS
 
 DB_PATH = os.getenv("DB_PATH", "bot.db")
 
 
 def get_conn():
     dir_name = os.path.dirname(DB_PATH)
-if dir_name:
-    os.makedirs(dir_name, exist_ok=True)
+    if dir_name:
+        os.makedirs(dir_name, exist_ok=True)
+
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
