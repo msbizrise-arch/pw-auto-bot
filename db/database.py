@@ -2,6 +2,9 @@ import sqlite3
 import os
 from datetime import datetime, timedelta
 from config import DB_PATH, SUDO_USERS
+import os
+
+DB_PATH = os.getenv("DB_PATH", "bot.db")
 
 
 def get_conn():
