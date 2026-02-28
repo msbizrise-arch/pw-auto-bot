@@ -31,7 +31,7 @@ async def main():
 
     # 2️⃣ Start userbot properly
     print("[Boot] Starting userbot...")
-    await userbot.start()
+    await start_userbot()
     print("[Boot] ✅ Userbot started")
 
     # 3️⃣ Start Bot Client
@@ -50,7 +50,7 @@ async def main():
     print("[Boot] ✅ Handlers registered")
 
     # 5️⃣ Start bot
-    await bot.start()
+    await start_userbot()
     me = await bot.get_me()
     print(f"[Boot] ✅ Bot running as @{me.username}")
 
