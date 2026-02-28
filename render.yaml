@@ -19,9 +19,4 @@ services:
       - key: SUDO_USERS
         sync: false
       - key: DB_PATH
-        value: /var/data/bot.db
-
-disk:
-  - name: data
-    mountPath: /data
-    sizeGB: 1
+        value: bot.db
