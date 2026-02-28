@@ -1,5 +1,5 @@
 """
-bot.py — Main Entry Point (Web Service Mode)
+bot.py — Main Entry Point (Webhook Mode - FIXED)
 Production-safe for Python 3.11–3.14
 """
 
@@ -9,14 +9,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Response
 from pyrogram import Client
 import uvicorn
+import aiohttp
 
-# Optional uvloop (only if available)
+# Optional uvloop
 if sys.platform != "win32":
     try:
         import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     except ImportError:
-        pass  # perfectly fine without uvloop
+        pass
 
 from config import BOT_TOKEN, API_ID, API_HASH, SESSION, WEBHOOK_URL, PORT, SUDO_USERS
 from db.database import init_db
@@ -27,6 +28,22 @@ from handlers.extraction import register_extraction
 from handlers.admin import register_admin
 
 bot: Client = None
+
+
+# 🔥 Telegram webhook setter (manual)
+async def set_webhook(url: str):
+    async with aiohttp.ClientSession() as session:
+        await session.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/setWebhook",
+            json={"url": url}
+        )
+
+
+async def delete_webhook():
+    async with aiohttp.ClientSession() as session:
+        await session.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook"
+        )
 
 
 @asynccontextmanager
@@ -61,9 +78,9 @@ async def lifespan(app: FastAPI):
     me = await bot.get_me()
     print(f"[Boot] ✅ Bot: @{me.username}")
 
-    # 6. Set webhook
+    # 6. Set webhook manually
     webhook_url = f"{WEBHOOK_URL}/webhook"
-    await bot.set_webhook(webhook_url)
+    await set_webhook(webhook_url)
     print(f"[Boot] ✅ Webhook set: {webhook_url}")
 
     # 7. Notify sudo users
@@ -74,12 +91,12 @@ async def lifespan(app: FastAPI):
             except Exception:
                 pass
 
-    yield  # ← App runs here
+    yield
 
-    # Shutdown section
+    # Shutdown
     print("[Shutdown] Stopping...")
     try:
-        await bot.remove_webhook()
+        await delete_webhook()
     except Exception:
         pass
     try:
@@ -118,7 +135,6 @@ async def webhook(request: Request):
     return Response(status_code=200)
 
 
-# ⚠ IMPORTANT: Do NOT manually create loop anymore
 if __name__ == "__main__":
     uvicorn.run(
         "bot:app",
