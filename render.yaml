@@ -23,5 +23,5 @@ services:
 
 disk:
   - name: data
-    mountPath: /var/data
+    mountPath: /data
     sizeGB: 1
